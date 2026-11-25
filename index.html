@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para ti 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { min-height: 100%; }
+
+  body {
+    min-height: 100vh;
+    font-family: "Quicksand", "Segoe UI", sans-serif;
+    background: linear-gradient(160deg, #ffdfee 0%, #ffc4dc 45%, #e9c9ff 100%);
+    background-attachment: fixed;
+    display: flex;
+    text-align: center;
+    overflow-x: hidden;
+    color: #6b1a45;
+    position: relative;
+  }
+
+  /* manchas de color suaves de fondo */
+  body::before, body::after {
+    content: "";
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(70px);
+    z-index: 0;
+    pointer-events: none;
+  }
+  body::before { width: 320px; height: 320px; background: #ff9ec9; top: -80px; left: -80px; opacity: .55; }
+  body::after  { width: 360px; height: 360px; background: #cfa8ff; bottom: -100px; right: -100px; opacity: .5; }
+
+  .escena {
+    width: 100%;
+    max-width: 560px;
+    margin: auto;
+    padding: 24px 16px 40px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ---------- GATITOS ---------- */
+  .gatos {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 200px;
+    position: relative;
+  }
+  .gato { width: 160px; transition: transform 1s ease; filter: drop-shadow(0 8px 10px rgba(150, 40, 100, .18)); }
+  .gato.derecha { transform: scaleX(-1); }
+  .gatos.abrazo .gato.izquierda { transform: translateX(34px); }
+  .gatos.abrazo .gato.derecha   { transform: scaleX(-1) translateX(34px); }
+
+  .gato svg { width: 100%; height: auto; overflow: visible; }
+  .cabeza { transform-origin: 100px 140px; animation: inclinar 2.8s ease-in-out infinite; }
+  .cola   { transform-origin: 150px 190px; animation: cola 1.9s ease-in-out infinite; }
+  .ojo    { transform-origin: center; transform-box: fill-box; animation: parpadeo 4s infinite; }
+  .cuerpo { transform-origin: 100px 215px; animation: respirar 2.8s ease-in-out infinite; }
+  .gato.derecha .cabeza { animation-delay: .5s; }
+  .gato.derecha .cola   { animation-delay: .7s; }
+
+  @keyframes inclinar { 0%,100% { transform: rotate(-4deg); } 50% { transform: rotate(10deg); } }
+  @keyframes cola { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(14deg); } }
+  @keyframes parpadeo { 0%,92%,100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+  @keyframes respirar { 0%,100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+
+  .corazon-centro {
+    position: absolute;
+    left: 50%; top: 14px;
+    font-size: 40px;
+    transform: translateX(-50%);
+    animation: latido 1.2s ease-in-out infinite;
+  }
+  @keyframes latido { 0%,100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.3); } }
+
+  /* ---------- TARJETA ---------- */
+  .tarjeta {
+    background: rgba(255, 255, 255, .55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, .8);
+    border-radius: 28px;
+    padding: 26px 22px 28px;
+    margin-top: 6px;
+    box-shadow: 0 14px 40px rgba(170, 50, 120, .18);
+  }
+
+  .pantalla { display: none; }
+  .pantalla.activa { display: block; animation: entrar .8s ease both; }
+  @keyframes entrar { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  h1 {
+    font-family: "Dancing Script", cursive;
+    font-size: clamp(2.1rem, 8vw, 3rem);
+    line-height: 1.15;
+    margin-bottom: 10px;
+    color: #c2185b;
+  }
+  .sub { font-size: 1.05rem; margin-bottom: 14px; opacity: .85; }
+
+  /* ---------- CARTA ---------- */
+  .linea {
+    font-size: 1.13rem;
+    line-height: 1.55;
+    margin: 12px 0;
+    opacity: 0;
+    animation: aparecer 1.1s ease forwards;
+  }
+  .linea.fuerte { font-weight: 700; color: #b0155a; }
+  @keyframes aparecer { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- BOTONES ---------- */
+  button {
+    font-family: inherit;
+    font-weight: 700;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(190, 40, 110, .28);
+  }
+  .btn-continuar {
+    background: linear-gradient(135deg, #ff5fa2, #e91e7a);
+    color: #fff;
+    font-size: 1.1rem;
+    padding: 13px 32px;
+    margin-top: 12px;
+    opacity: 0;
+    animation: aparecer 1s ease forwards;
+  }
+
+  .botones {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    min-height: 170px;
+    flex-wrap: wrap;
+  }
+  #si {
+    background: linear-gradient(135deg, #ff5fa2, #e91e7a);
+    color: #fff;
+    font-size: 1.3rem;
+    padding: 14px 36px;
+    transition: transform .3s ease;
+    transform-origin: center;
+    z-index: 5;
+    animation: pulso 1.8s ease-in-out infinite;
+  }
+  @keyframes pulso { 0%,100% { box-shadow: 0 8px 20px rgba(190,40,110,.28); } 50% { box-shadow: 0 8px 34px rgba(233,30,122,.6); } }
+  #no {
+    background: #fff;
+    color: #b0467a;
+    font-size: 1.05rem;
+    padding: 12px 26px;
+    transition: left .28s ease, top .28s ease;
+    z-index: 10;
+  }
+  #no.suelto { position: fixed; }
+
+  /* ---------- BOTÓN DE MÚSICA ---------- */
+  #btnMusica {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 20;
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+    background: rgba(255,255,255,.85);
+    display: none;
+  }
+  #btnMusica.apagada { opacity: .5; }
+
+  /* ---------- FINAL ---------- */
+  .mensaje {
+    background: rgba(255,255,255,.8);
+    border-radius: 18px;
+    padding: 13px 18px;
+    margin: 11px auto;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    opacity: 0;
+    animation: aparecer .9s ease forwards;
+    box-shadow: 0 4px 14px rgba(180, 40, 100, .12);
+  }
+  .mensaje.grande {
+    font-family: "Dancing Script", cursive;
+    font-size: 1.9rem;
+    color: #c2185b;
+    background: rgba(255,255,255,.9);
+  }
+  .firma {
+    margin-top: 16px;
+    font-family: "Dancing Script", cursive;
+    font-size: 1.7rem;
+    color: #b0155a;
+    opacity: 0;
+    animation: aparecer 1s ease forwards;
+  }
+
+  /* ---------- FLOTANTES ---------- */
+  .flota {
+    position: fixed;
+    bottom: -50px;
+    pointer-events: none;
+    z-index: 1;
+    animation: subir linear forwards;
+  }
+  @keyframes subir { to { transform: translateY(-115vh) rotate(30deg); opacity: 0; } }
+
+  .estrella {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1;
+    animation: brillar 3s ease-in-out infinite;
+  }
+  @keyframes brillar { 0%,100% { opacity: .15; transform: scale(.7); } 50% { opacity: .95; transform: scale(1.2); } }
+</style>
+</head>
+<body>
+
+<div class="escena">
+
+  <!-- GATITOS -->
+  <div class="gatos" id="gatos">
+    <div class="corazon-centro">💖</div>
+
+    <div class="gato izquierda">
+      <svg viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg">
+        <g class="cola">
+          <path d="M150 195 C195 195 200 140 170 128" fill="none" stroke="#9aa0b5" stroke-width="16" stroke-linecap="round"/>
+        </g>
+        <g class="cuerpo">
+          <ellipse cx="100" cy="185" rx="56" ry="44" fill="#b4bacd"/>
+          <ellipse cx="100" cy="195" rx="30" ry="28" fill="#eef0f7"/>
+          <ellipse cx="72" cy="224" rx="16" ry="9" fill="#eef0f7"/>
+          <ellipse cx="128" cy="224" rx="16" ry="9" fill="#eef0f7"/>
+        </g>
+        <g class="cabeza">
+          <polygon points="46,82 50,22 96,58" fill="#b4bacd"/>
+          <polygon points="154,82 150,22 104,58" fill="#b4bacd"/>
+          <polygon points="56,70 58,38 82,58" fill="#ffb3cf"/>
+          <polygon points="144,70 142,38 118,58" fill="#ffb3cf"/>
+          <ellipse cx="100" cy="100" rx="60" ry="52" fill="#b4bacd"/>
+          <ellipse cx="100" cy="116" rx="26" ry="20" fill="#eef0f7"/>
+          <ellipse class="ojo" cx="76" cy="98" rx="7" ry="10" fill="#3a2a4a"/>
+          <ellipse class="ojo" cx="124" cy="98" rx="7" ry="10" fill="#3a2a4a"/>
+          <circle cx="78" cy="94" r="2.6" fill="#fff"/>
+          <circle cx="126" cy="94" r="2.6" fill="#fff"/>
+          <circle cx="62" cy="116" r="9" fill="#ff9ec4" opacity=".6"/>
+          <circle cx="138" cy="116" r="9" fill="#ff9ec4" opacity=".6"/>
+          <polygon points="94,112 106,112 100,119" fill="#ff7aa8"/>
+          <path d="M100 119 Q94 128 88 122 M100 119 Q106 128 112 122" fill="none" stroke="#7a4a6a" stroke-width="2.2" stroke-linecap="round"/>
+          <g stroke="#7a4a6a" stroke-width="1.8" stroke-linecap="round">
+            <line x1="40" y1="112" x2="68" y2="116"/><line x1="40" y1="124" x2="68" y2="122"/>
+            <line x1="160" y1="112" x2="132" y2="116"/><line x1="160" y1="124" x2="132" y2="122"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <div class="gato derecha">
+      <svg viewBox="0 0 200 230" xmlns="http://www.w3.org/2000/svg">
+        <g class="cola">
+          <path d="M150 195 C195 195 200 140 170 128" fill="none" stroke="#f0a050" stroke-width="16" stroke-linecap="round"/>
+        </g>
+        <g class="cuerpo">
+          <ellipse cx="100" cy="185" rx="56" ry="44" fill="#ffb866"/>
+          <ellipse cx="100" cy="195" rx="30" ry="28" fill="#fff1dc"/>
+          <ellipse cx="72" cy="224" rx="16" ry="9" fill="#fff1dc"/>
+          <ellipse cx="128" cy="224" rx="16" ry="9" fill="#fff1dc"/>
+        </g>
+        <g class="cabeza">
+          <polygon points="46,82 50,22 96,58" fill="#ffb866"/>
+          <polygon points="154,82 150,22 104,58" fill="#ffb866"/>
+          <polygon points="56,70 58,38 82,58" fill="#ffb3cf"/>
+          <polygon points="144,70 142,38 118,58" fill="#ffb3cf"/>
+          <ellipse cx="100" cy="100" rx="60" ry="52" fill="#ffb866"/>
+          <path d="M100 50 L100 66 M88 52 L90 66 M112 52 L110 66" stroke="#f0a050" stroke-width="5" stroke-linecap="round"/>
+          <ellipse cx="100" cy="116" rx="26" ry="20" fill="#fff1dc"/>
+          <ellipse class="ojo" cx="76" cy="98" rx="7" ry="10" fill="#3a2a4a"/>
+          <ellipse class="ojo" cx="124" cy="98" rx="7" ry="10" fill="#3a2a4a"/>
+          <circle cx="78" cy="94" r="2.6" fill="#fff"/>
+          <circle cx="126" cy="94" r="2.6" fill="#fff"/>
+          <circle cx="62" cy="116" r="9" fill="#ff9ec4" opacity=".6"/>
+          <circle cx="138" cy="116" r="9" fill="#ff9ec4" opacity=".6"/>
+          <polygon points="94,112 106,112 100,119" fill="#ff7aa8"/>
+          <path d="M100 119 Q94 128 88 122 M100 119 Q106 128 112 122" fill="none" stroke="#7a4a6a" stroke-width="2.2" stroke-linecap="round"/>
+          <g stroke="#7a4a6a" stroke-width="1.8" stroke-linecap="round">
+            <line x1="40" y1="112" x2="68" y2="116"/><line x1="40" y1="124" x2="68" y2="122"/>
+            <line x1="160" y1="112" x2="132" y2="116"/><line x1="160" y1="124" x2="132" y2="122"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="tarjeta">
+
+    <!-- 1) CARTA -->
+    <div class="pantalla activa" id="carta">
+      <h1 id="tituloCarta"></h1>
+      <div id="lineasCarta"></div>
+      <button class="btn-continuar" id="continuar">Sigue leyendo 💌</button>
+    </div>
+
+    <!-- 2) PREGUNTA -->
+    <div class="pantalla" id="pregunta">
+      <h1 id="titulo"></h1>
+      <p class="sub" id="subPregunta"></p>
+      <div class="botones" id="botones">
+        <button id="si">Sí 💕</button>
+        <button id="no">No</button>
+      </div>
+    </div>
+
+    <!-- 3) RESPUESTA SÍ -->
+    <div class="pantalla" id="final">
+      <h1 id="tituloFinal"></h1>
+      <div id="mensajes"></div>
+      <p class="firma" id="firma"></p>
+    </div>
+
+  </div>
+</div>
+
+<!-- MÚSICA: guarda tu canción como "cancion.mp3" en la misma carpeta que este archivo -->
+<audio id="musica" src="cancion.mp3" loop preload="auto"></audio>
+<button id="btnMusica" title="Música">🎵</button>
+
+<script>
+  // =====================================================
+  //   EDITA TODO ESTO CON TUS PALABRAS ✏️
+  // =====================================================
+  const PARA = "Vanessa";
+  const DE   = "Atziri Odemaris";          // <- tu nombre (si prefieres solo "Atziri", cámbialo aquí)
+
+  // Segundo de la canción donde empieza (0 = desde el principio, 45 = desde el segundo 45)
+  const INICIO_CANCION = 0;
+
+  // Carta que lee antes de la pregunta
+  const TITULO_CARTA = "Vanessa...";
+  const CARTA = [
+    "Sé que no tenemos mucho tiempo de conocernos.",
+    "Pero en este poquito tiempo me has hecho sentir muchísimo.",
+    "Contigo me siento feliz, tranquila y yo misma.",
+    "Me da pena decírtelo de frente, por eso hice esto 🥹",
+    "Y quiero que sepas que lo que siento es de verdad."
+  ];
+  const ULTIMA_LINEA_FUERTE = "Te amo, Vanessa. 💖";
+
+  // Pregunta
+  const PREGUNTA = "¿Quieres ser mi novia?";
+  const SUB_PREGUNTA = "Tómate tu tiempo... pero ojalá digas que sí 🥺";
+
+  // Cuando dice que sí
+  const TITULO_FINAL = "Ay, no manches 🥹💖";
+  const MENSAJES = [
+    "Gracias por darme la oportunidad de quererte.",
+    "A veces no hace falta mucho tiempo para saber lo que uno siente, y yo lo sé contigo.",
+    "Prometo cuidarte, escucharte, hacerte reír y quererte bonito, todos los días.",
+    "Gracias por decir que sí. De verdad me haces muy feliz 💕",
+    { texto: "Eres mi persona favorita 💞", grande: true }
+  ];
+
+  // Textos que va cambiando el botón "No" mientras se escapa
+  const TEXTOS_NO = [
+    "No", "¿Segura? 🥺", "Piénsalo 😿", "Mira estos ojitos 🥹",
+    "Anda, di que sí 💕", "No me hagas esto 😭", "Los gatitos lloran 🐱💧",
+    "Jaja casi me atrapas", "Mejor dile que sí 😝", "Sí es la respuesta 💖"
+  ];
+  // =====================================================
+
+
+  const $ = (id) => document.getElementById(id);
+  function mostrar(id) {
+    document.querySelectorAll(".pantalla").forEach(p => p.classList.remove("activa"));
+    $(id).classList.add("activa");
+  }
+
+  // ---------- CARTA ----------
+  $("tituloCarta").textContent = TITULO_CARTA;
+  const contLineas = $("lineasCarta");
+  const lineas = [...CARTA, ULTIMA_LINEA_FUERTE];
+  lineas.forEach((txt, i) => {
+    const p = document.createElement("p");
+    p.className = "linea" + (i === lineas.length - 1 ? " fuerte" : "");
+    p.textContent = txt;
+    p.style.animationDelay = (0.5 + i * 1.9) + "s";
+    contLineas.appendChild(p);
+  });
+  $("continuar").style.animationDelay = (0.5 + lineas.length * 1.9) + "s";
+
+  // ---------- SIGUE LEYENDO (aquí arranca la música) ----------
+  $("continuar").addEventListener("click", () => {
+    mostrar("pregunta");
+    // guardamos el ancho original del botón Sí para poder limitar cuánto crece
+    anchoBaseSi = $("si").offsetWidth;
+
+    // la música empieza justo al dar clic
+    const musica = $("musica");
+    musica.currentTime = INICIO_CANCION;
+    musica.volume = 0.6;
+    musica.play().catch(() => {});
+    $("btnMusica").style.display = "block";
+  });
+
+  // botón para pausar / reanudar la música
+  $("btnMusica").addEventListener("click", () => {
+    const musica = $("musica");
+    if (musica.paused) {
+      musica.play();
+      $("btnMusica").classList.remove("apagada");
+    } else {
+      musica.pause();
+      $("btnMusica").classList.add("apagada");
+    }
+  });
+
+  // ---------- PREGUNTA ----------
+  $("titulo").textContent = PREGUNTA;
+  $("subPregunta").textContent = SUB_PREGUNTA;
+
+  const si = $("si");
+  const no = $("no");
+  let intentos = 0;
+  let anchoBaseSi = 140;
+
+  function seTocan(a, b, margen = 20) {
+    return !(a.right + margen < b.left || a.left - margen > b.right ||
+             a.bottom + margen < b.top || a.top - margen > b.bottom);
+  }
+
+  function huir(e) {
+    if (e) e.preventDefault();
+    intentos++;
+
+    // el botón "Sí" se hace más grande (sin salirse de la pantalla)
+    const maxPantalla = (window.innerWidth - 40) / anchoBaseSi;
+    const escala = Math.min(1 + intentos * 0.25, 3.4, maxPantalla);
+    si.style.transform = `scale(${escala})`;
+
+    no.textContent = TEXTOS_NO[intentos % TEXTOS_NO.length];
+    no.classList.add("suelto");
+
+    const w = no.offsetWidth, h = no.offsetHeight;
+    const siRect = si.getBoundingClientRect();
+    let x, y, tries = 0;
+    do {
+      x = Math.random() * (window.innerWidth - w - 20) + 10;
+      y = Math.random() * (window.innerHeight - h - 20) + 10;
+      tries++;
+    } while (
+      tries < 50 &&
+      seTocan({ left: x, top: y, right: x + w, bottom: y + h }, siRect)
+    );
+    no.style.left = x + "px";
+    no.style.top = y + "px";
+  }
+
+  no.addEventListener("pointerenter", huir);
+  no.addEventListener("pointerdown", huir);
+  no.addEventListener("click", huir);
+  no.addEventListener("touchstart", huir, { passive: false });
+
+  // ---------- CORAZONES Y ESTRELLITAS ----------
+  function corazon() {
+    const c = document.createElement("div");
+    c.className = "flota";
+    c.textContent = ["💖","💗","💕","💞","🌸","✨","🌷"][Math.floor(Math.random() * 7)];
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.fontSize = 16 + Math.random() * 28 + "px";
+    c.style.animationDuration = 6 + Math.random() * 6 + "s";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 12500);
+  }
+  setInterval(corazon, 700);
+
+  for (let i = 0; i < 18; i++) {
+    const s = document.createElement("div");
+    s.className = "estrella";
+    s.textContent = "✦";
+    s.style.left = Math.random() * 100 + "vw";
+    s.style.top = Math.random() * 100 + "vh";
+    s.style.fontSize = 10 + Math.random() * 14 + "px";
+    s.style.color = Math.random() > .5 ? "#fff" : "#ff9ec9";
+    s.style.animationDelay = Math.random() * 3 + "s";
+    document.body.appendChild(s);
+  }
+
+  // ---------- CLICK EN SÍ ----------
+  si.addEventListener("click", () => {
+    no.style.display = "none";
+    $("gatos").classList.add("abrazo");
+    mostrar("final");
+
+    $("tituloFinal").textContent = TITULO_FINAL;
+
+    const cont = $("mensajes");
+    MENSAJES.forEach((m, i) => {
+      const obj = typeof m === "string" ? { texto: m } : m;
+      const d = document.createElement("div");
+      d.className = "mensaje" + (obj.grande ? " grande" : "");
+      d.textContent = obj.texto;
+      d.style.animationDelay = (1 + i * 2.4) + "s";
+      cont.appendChild(d);
+    });
+
+    const firma = $("firma");
+    firma.textContent = `Con todo mi amor, ${DE} 💌`;
+    firma.style.animationDelay = (1 + MENSAJES.length * 2.4) + "s";
+
+    for (let i = 0; i < 70; i++) setTimeout(corazon, i * 80);
+    setInterval(corazon, 250);
+  });
+</script>
+</body>
+</html>
